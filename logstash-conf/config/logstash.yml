@@ -1,0 +1,11 @@
+log.level: info
+path.config: /usr/share/logstash/pipeline
+config.reload.automatic: true
+# support_escapes needs logstash 5.6
+# config.support_escapes: true
+http.host: "0.0.0.0"
+xpack.monitoring.enabled: false
+#xpack.monitoring.elasticsearch.url: https://hostnamegoeshere:9243
+#xpack.monitoring.elasticsearch.username: logstash
+#xpack.monitoring.elasticsearch.password: changeme
+#xpack.monitoring.elasticsearch.url: http://elasticsearch:9200

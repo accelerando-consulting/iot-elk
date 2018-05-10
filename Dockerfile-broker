@@ -1,0 +1,2 @@
+FROM eclipse/mosquitto
+ADD mosquitto-conf /mqtt/config

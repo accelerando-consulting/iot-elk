@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#
+# Insert some dummy data to force creation of at least one data index
+#
+NOW=`date -Ins`
+curl -s -X POST -u ${ELASTICUSER}:${ELASTICPASS}  --header "Content-Type: application/json" -d @- ${ELASTICURL}/sites/dummy <<EOF
+{
+  "@timestamp": "$NOW"
+}
+EOF
+
+curl -s -X POST -u ${ELASTICUSER}:${ELASTICPASS}  --header "Content-Type: application/json" -d @- ${ELASTICURL}/data-dummy-`date +%Y.%m.%d`/dummy <<EOF
+{
+  "@timestamp": "$NOW"
+}
+EOF
+

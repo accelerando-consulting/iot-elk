@@ -1,0 +1,36 @@
+#
+# This is for running the IoT data pipeline on an Amazon EC2 instance, using
+# Elasticsearch on Elastic Cloud.
+#
+# See docker-compose-dev.yml for running on a workstation self-contained
+#
+version: "3"
+services:
+  broker:
+    container_name: broker
+    ports:
+      - 1883:1883
+      - 8883:8883
+      - 9883:9883
+    # NOTE: comment out volumes for deploy and package config inside container 
+    #volumes:
+    #  - $PWD/mosquitto-conf:/mqtt/config
+    build:
+      dockerfile: Dockerfile-broker
+      context: .
+  logstash:
+    container_name: logstash
+    environment:
+      - ELASTICSEARCH_URL=https://hostnamegoeshere
+      - ELASTICSEARCH_USER=logstash
+      - ELASTICSEARCH_PASSWORD=passwordgoeshere
+    # NOTE: comment out volumes for deploy, use config inside container 
+    #volumes:
+    #  - $PWD/logstash-conf/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+    #  - $PWD/logstash-conf/conf.d/:/usr/share/logstash/pipeline
+    #  - $PWD/logstash-conf/ruckus/:/usr/share/logstash/protobuf/
+    links:
+     - broker
+    build:
+      dockerfile: Dockerfile-logstash
+      context: .

@@ -1,0 +1,51 @@
+#
+#  Run the IoT data pipeline on a workstation
+#
+version: "3"
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+    ports:
+      - 9200:9200
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - ELASTIC_PASSWORD=WetFloor
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:6.2.4
+    links:
+      - elasticsearch      
+    ports:
+      - "5601:5601"
+    #volumes:
+    #  - ./kibana-conf/kibana.yml:/usr/share/kibana/config/kibana.yml
+  broker:
+    container_name: broker
+    ports:
+      - 1883:1883
+      - 8883:8883
+      - 9883:9883
+    # NOTE: comment out volumes for deploy, use config inside container 
+    volumes:
+      - $PWD/mosquitto-conf/:/mqtt/config/
+    build:
+      dockerfile: Dockerfile-broker
+      context: .
+  logstash:
+    container_name: logstash
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200/
+      - ELASTICSEARCH_USER=logstash
+      - ELASTICSEARCH_PASSWORD=HereItComes
+    # NOTE: comment volumes for deploy, use config inside container 
+    volumes:
+      - $PWD/logstash-conf/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - $PWD/logstash-conf/conf.d/:/usr/share/logstash/pipeline
+    links:
+      - broker
+      - elasticsearch
+    build:
+      dockerfile: Dockerfile-logstash
+      context: .
