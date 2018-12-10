@@ -8,9 +8,9 @@
 
 # Production setup
 
-1. Sensors have LoRA radios
-2. On-site LoRAWAN concentrator
-3. LoRAWAN server relays to MQTT
+1. Sensors communicate via WiFi or LPWAN
+2. On-site concentrator
+3. Site concentrator relays to MQTT (or sensors may go direct)
 2. Mosquitto in docker on EC2 instance 
 3. Logstash in docker on EC2 instance 
 4. Elasticsearch hosted by cloud.elastic.co
@@ -19,7 +19,7 @@ The docker-compose-live.yml file sets up components 2+3
 
 # Development setup
 
-1. Dev Sensors transmit direct to MQTT (skip LoRA)
+1. Dev Sensors transmit direct to MQTT (skip LPWAN)
 2. Mosquitto in docker
 3. Logstash in docker
 4. Elasticsearch in docker
@@ -67,6 +67,7 @@ you can start and stop the whole enchilada with `make start` and `make stop`
 # Populating a real (elastic cloud) elasticsearch 
 
 (password 'changeme' is a placeholder for actual password)
+
 ('eshost' is a placeholder for the hostname of the ES server)
 
 ```
