@@ -5,7 +5,7 @@ version: "3"
 services:
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.2
     ports:
       - 9200:9200
     environment:
@@ -14,7 +14,7 @@ services:
       - ELASTIC_PASSWORD=WetFloor
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:6.2.4
+    image: docker.elastic.co/kibana/kibana:6.5.2
     links:
       - elasticsearch      
     ports:

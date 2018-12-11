@@ -1,2 +1,5 @@
-FROM eclipse/mosquitto
+# Note the gold eclipse/mosquitto image is not built with TLS bridge support.
+# So using an unofficial image for now.
+FROM toke/mosquitto
+#FROM eclipse/mosquitto
 ADD mosquitto-conf /mqtt/config

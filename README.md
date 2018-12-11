@@ -4,7 +4,7 @@
 1. Sensor data transmitted via MQTT
 3. Logstash consumes MQTT input (augments events with site/sensor data such as geolocation)
 4. Elasticsearch data lake
-5. Serverless API, plus Elm user interface
+5. Serverless API, plus Elm user interface 
 
 # Production setup
 

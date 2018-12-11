@@ -1,4 +1,4 @@
-FROM docker.elastic.co/logstash/logstash:5.3.0
+FROM docker.elastic.co/logstash/logstash:6.5.2
 ENV PATH="/usr/share/logstash/vendor/jruby/bin:${PATH}"
 WORKDIR /usr/share/logstash
 COPY logstash-input-mqtt-0.1.0.gem ./
