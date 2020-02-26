@@ -2,18 +2,19 @@
 # IoT data pipeline
 
 1. Sensor data transmitted via MQTT
-3. Logstash consumes MQTT input (augments events with site/sensor data such as geolocation)
-4. Elasticsearch data lake
-5. Serverless API, plus Elm user interface 
+2. Logstash consumes MQTT input (augments events with site/sensor data such as geolocation)
+3. Elasticsearch data lake
+4. [optional] Serverless API, S3-hosted web interface
+5. [optional] kafka or kinesis for sending alerts onward or processing events
 
 # Production setup
 
 1. Sensors communicate via WiFi or LPWAN
 2. On-site concentrator
 3. Site concentrator relays to MQTT (or sensors may go direct)
-2. Mosquitto in docker on EC2 instance 
-3. Logstash in docker on EC2 instance 
-4. Elasticsearch hosted by cloud.elastic.co
+4. Mosquitto in docker on EC2 instance 
+5. Logstash in docker on EC2 instance 
+6. Elasticsearch hosted by cloud.elastic.co or on AWS
 
 The docker-compose-live.yml file sets up components 2+3
 
@@ -28,6 +29,8 @@ The docker-compose-live.yml file sets up components 2+3
 The docker-compose.yml file sets up components 2,3,4,5
 
 ## Setup instructions
+
+Search for 'example.com' and replace any instances with your names.
 
 Just run "make setup".
 
