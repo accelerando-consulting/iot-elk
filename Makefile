@@ -23,7 +23,7 @@ setup:  config
 	  echo "NOT starting elasticsearch (use cloud.elastic.co instead)." ; \
 	fi
 	@echo "Inserting metadata into Elasticsearch..."
-	@. ./config.inc && for s in scripts/* ; do echo "    ...run $$s"; $$s 2>&1 | sed -e 's/^/\t/' ; echo ""; done
+	@./populate.sh
 	@echo "Starting logstash to populate index."
 	docker-compose up --build -d logstash
 	docker-compose up -d kibana

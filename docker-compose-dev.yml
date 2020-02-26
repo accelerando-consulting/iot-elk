@@ -5,33 +5,53 @@ version: "3"
 services:
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
     ports:
-      - 9200:9200
+      - 127.0.0.1:9200:9200
     environment:
       - http.host=0.0.0.0
       - transport.host=127.0.0.1
-      - ELASTIC_PASSWORD=WetFloor
+      - ELASTIC_PASSWORD=RobotUprising
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+      - "127.0.0.1:2181:2181"
+    restart: unless-stopped
+  kafka:
+    # See https://github.com/wurstmeister/kafka-docker
+    container_name: kafka
+    image: wurstmeister/kafka
+    ports:
+      - "127.0.0.1:9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: ${KAFKA_NAME:-kafka}
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "test:1:1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - zookeeper
+    restart: unless-stopped
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:6.5.2
+    image: docker.elastic.co/kibana/kibana:7.6.0
     links:
       - elasticsearch      
     ports:
-      - "5601:5601"
-    #volumes:
-    #  - ./kibana-conf/kibana.yml:/usr/share/kibana/config/kibana.yml
-  broker:
-    container_name: broker
+      - "127.0.0.1:5601:5601"
+    volumes:
+      - ./kibana-conf/kibana.yml:/usr/share/kibana/config/kibana.yml
+  mqtt:
+    container_name: mqtt
     ports:
-      - 1883:1883
+      - 127.0.0.1:1883:1883
       - 8883:8883
-      - 9883:9883
-    # NOTE: comment out volumes for deploy, use config inside container 
     volumes:
       - $PWD/mosquitto-conf/:/mqtt/config/
+      - $PWD/certs/:/mqtt/certs/
     build:
-      dockerfile: Dockerfile-broker
+      dockerfile: Dockerfile-mqtt-${ARCH:-x86}
       context: .
   logstash:
     container_name: logstash
@@ -39,13 +59,66 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200/
       - ELASTICSEARCH_USER=logstash
       - ELASTICSEARCH_PASSWORD=HereItComes
-    # NOTE: comment volumes for deploy, use config inside container 
     volumes:
       - $PWD/logstash-conf/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - $PWD/logstash-conf/conf.d/:/usr/share/logstash/pipeline
     links:
-      - broker
       - elasticsearch
+      - mqtt
+      - kafka
+    restart: always
     build:
       dockerfile: Dockerfile-logstash
       context: .
+  #filebeat:
+  #  container_name: filebeat
+  #  volumes:
+  #    - $PWD/filebeat-conf/config/filebeat.yml:/usr/share/filebeat/config/filebeat.yml
+  #    - /usr/share/filebeat/data
+  #  build:
+  #    dockerfile: Dockerfile-filebeat-${ARCH:-x86}
+  #    context: .
+  node-red:
+    # see https://hub.docker.com/r/nodered/node-red-docker/
+    container_name: node-red
+    privileged: true
+    volumes:
+      - ./node-red:/data
+      - ./certs:/certs
+    links:
+      - elasticsearch
+      - mqtt
+   #   - kafka
+   #   - kibana
+    ports:
+      - "127.0.0.1:1880:1880"
+    build:
+      dockerfile: Dockerfile-nodered-${ARCH:-x86}
+      context: .
+    restart: unless-stopped
+  nginx:
+    # see https://store.docker.com/images/nginx?tab=description
+    image: nginx
+    container_name: nginx
+    restart: unless-stopped
+    links:
+      - node-red
+      - elasticsearch
+      - kibana
+    ports:
+      - "80:80"
+      - "443:443"
+      - "3000:3000"
+      - "9001:9001"
+      - "8001:8001"
+      - "9243:9243"
+    volumes:
+      - ./:/opt/iot-elk
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    environment:
+      - BASE_DOMAIN:${BASE_DOMAIN:-lan}
+    command: nginx -g 'daemon off;'
+
+volumes:
+  elasticsearch-data:

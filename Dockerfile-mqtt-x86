@@ -1,0 +1,2 @@
+FROM toke/mosquitto
+ADD mosquitto-conf /mqtt/config

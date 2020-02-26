@@ -1,5 +1,5 @@
-#
-# This is for running the IoT data pipeline on an Amazon EC2 instance, using
+# This is for running the IoT data pipeline on an Amazon EC2 instance, using#
+
 # Elasticsearch on Elastic Cloud.
 #
 # See docker-compose-dev.yml for running on a workstation self-contained

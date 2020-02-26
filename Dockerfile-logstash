@@ -1,10 +1,11 @@
-FROM docker.elastic.co/logstash/logstash:6.5.2
+FROM docker.elastic.co/logstash/logstash:7.6.0
 ENV PATH="/usr/share/logstash/vendor/jruby/bin:${PATH}"
 WORKDIR /usr/share/logstash
-COPY logstash-input-mqtt-0.1.0.gem ./
-RUN bin/logstash-plugin install logstash-input-mqtt-0.1.0.gem && rm logstash-input-mqtt-0.1.0.gem
+COPY logstash-input-paho-mqtt-0.1.5.gem ./
+RUN bin/logstash-plugin install logstash-input-paho-mqtt-0.1.5.gem && rm logstash-input-paho-mqtt-0.1.5.gem
 RUN bin/logstash-plugin install logstash-filter-elasticsearch
 RUN bin/logstash-plugin install logstash-output-kinesis
+RUN bin/logstash-plugin install logstash-output-mqtt
 RUN rm /usr/share/logstash/pipeline/logstash.conf
 RUN rm /usr/share/logstash/config/logstash.yml
 COPY logstash-conf/config/logstash.yml config/logstash.yml
